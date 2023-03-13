@@ -21,12 +21,12 @@ func main() {
 }
 
 type valueSource interface {
+	source() string
 	orig() string
 	values() []string
 }
 
 type model struct {
-	orig        string
 	values      []string
 	pathsLookup multimap.MultiMap[string, string]
 	paginator   paginator.Model
@@ -38,24 +38,34 @@ type envSource struct {
 
 func newEnvSource() *envSource {
 	if len(os.Args) != 2 {
-		fmt.Println("please provide the name of the environment variable to debug")
-		os.Exit(1)
+		failWith("please provide the name of the environment variable to debug")
 	}
 	return &envSource{os.Args[1]}
 }
 
 func (s *envSource) values() []string {
-	return strings.Split(s.orig(), string(os.PathListSeparator))
+	paths := strings.Split(s.orig(), string(os.PathListSeparator))
+	if len(paths) == 1 && paths[0] == "" {
+		return []string{}
+	}
+	return paths
 }
 
 func (s *envSource) orig() string {
 	return os.Getenv(s.name)
 }
 
-func initialModel() model {
+func (s *envSource) source() string {
+	return s.name
+}
 
+func initialModel() model {
 	var source valueSource = newEnvSource()
 	values := source.values()
+
+	if len(values) == 0 {
+		failWith(source.source() + " is empty")
+	}
 
 	pathsLookup := multimap.NewMapSet[string](func(a, b string) bool { return true })
 	for _, path := range values {
@@ -68,7 +78,6 @@ func initialModel() model {
 	p.SetTotalPages(len(values))
 
 	return model{
-		orig:        source.orig(),
 		values:      values,
 		pathsLookup: pathsLookup,
 		paginator:   p,
@@ -113,11 +122,17 @@ func (m model) View() string {
 `)
 
 	start, end := m.paginator.GetSliceBounds(len(m.values))
+	paths := m.values[start:end]
 
+	m.renderTable(&b, paths)
+
+	return b.String()
+}
+
+func (m model) renderTable(b *strings.Builder, paths []string) {
 	t := table.NewWriter()
-
 	t.AppendHeader(table.Row{"Dup #", "Bad", "Path"})
-	for _, path := range m.values[start:end] {
+	for _, path := range paths {
 		rep := " "
 		count := len(m.pathsLookup.Get(path))
 		if count > 1 {
@@ -133,8 +148,6 @@ func (m model) View() string {
 	b.WriteString("\n")
 
 	b.WriteString("  " + m.paginator.View())
-
-	return b.String()
 }
 
 func statusOf(path string) string {
@@ -148,4 +161,9 @@ func statusOf(path string) string {
 	}
 
 	return " "
+}
+
+func failWith(message string) {
+	fmt.Println(message)
+	os.Exit(1)
 }
