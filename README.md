@@ -15,7 +15,7 @@ go install
 from github:
 
 ```bash
-go install github.com/d-led/pathdebug@main`
+go install github.com/d-led/pathdebug@latest
 ```
 
 ## Usage
