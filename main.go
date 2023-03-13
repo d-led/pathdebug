@@ -8,7 +8,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/paginator"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/zyedidia/generic/multimap"
 )
@@ -66,8 +65,6 @@ func initialModel() model {
 	p := paginator.New()
 	p.Type = paginator.Dots
 	p.PerPage = 10
-	p.ActiveDot = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "235", Dark: "252"}).Render("•")
-	p.InactiveDot = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "250", Dark: "238"}).Render("•")
 	p.SetTotalPages(len(values))
 
 	return model{
@@ -79,7 +76,6 @@ func initialModel() model {
 }
 
 func (m model) Init() tea.Cmd {
-	// Just return `nil`, which means "no I/O right now, please."
 	return nil
 }
 
@@ -97,10 +93,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 
-		// Cool, what was the actual key pressed?
 		switch msg.String() {
 
-		// These keys should exit the program.
+		// quit
 		case "ctrl+c", "q", "esc":
 			return m, tea.Quit
 		}
@@ -114,7 +109,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	var b strings.Builder
 
-	b.WriteString(`tap Esc/q/Ctrl-C to quit
+	b.WriteString(`tap Esc/q/Ctrl-C to quit, <-/-> to paginate
 `)
 
 	start, end := m.paginator.GetSliceBounds(len(m.values))
