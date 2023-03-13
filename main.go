@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/paginator"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/mitchellh/go-homedir"
 	"github.com/zyedidia/generic/multimap"
 )
 
@@ -67,9 +69,11 @@ func initialModel() model {
 		failWith(source.source() + " is empty")
 	}
 
-	pathsLookup := multimap.NewMapSet[string](func(a, b string) bool { return true })
+	duplicatePredicate := func(a, b string) bool { return true }
+	pathsLookup := multimap.NewMapSet[string](duplicatePredicate)
 	for _, path := range values {
-		pathsLookup.Put(path, path)
+		pathKey := getAbsolutePath(path)
+		pathsLookup.Put(pathKey, path)
 	}
 
 	p := paginator.New()
@@ -82,6 +86,18 @@ func initialModel() model {
 		pathsLookup: pathsLookup,
 		paginator:   p,
 	}
+}
+
+func getAbsolutePath(path string) string {
+	expandedPath, err := homedir.Expand(path)
+	if err == nil {
+		path = expandedPath
+	}
+	absPath, err := filepath.Abs(path)
+	if err == nil {
+		path = absPath
+	}
+	return os.ExpandEnv(path)
 }
 
 func (m model) Init() tea.Cmd {
@@ -134,7 +150,7 @@ func (m model) renderTable(b *strings.Builder, paths []string) {
 	t.AppendHeader(table.Row{"Dup #", "Bad", "Path"})
 	for _, path := range paths {
 		rep := " "
-		count := len(m.pathsLookup.Get(path))
+		count := len(m.pathsLookup.Get(getAbsolutePath(path)))
 		if count > 1 {
 			rep = fmt.Sprint(count)
 		}
@@ -151,6 +167,7 @@ func (m model) renderTable(b *strings.Builder, paths []string) {
 }
 
 func statusOf(path string) string {
+	path = getAbsolutePath(path)
 	fileInfo, err := os.Stat(path)
 	if err != nil {
 		return "X"
