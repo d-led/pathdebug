@@ -9,11 +9,12 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/zyedidia/generic/multimap"
+	"github.com/zyedidia/generic/set"
 )
 
 type viewModel struct {
 	values      []string
-	pathsLookup multimap.MultiMap[string, string]
+	pathsLookup multimap.MultiMap[string, int]
 	paginator   paginator.Model
 }
 
@@ -25,11 +26,11 @@ func initialModel() viewModel {
 		failWith(source.source() + " is empty")
 	}
 
-	duplicatePredicate := func(a, b string) bool { return true }
+	duplicatePredicate := func(a, b int) bool { return true }
 	pathsLookup := multimap.NewMapSet[string](duplicatePredicate)
-	for _, path := range values {
+	for i, path := range values {
 		pathKey := getAbsolutePath(path)
-		pathsLookup.Put(pathKey, path)
+		pathsLookup.Put(pathKey, i)
 	}
 
 	p := paginator.New()
@@ -84,21 +85,20 @@ func (m viewModel) View() string {
 	start, end := m.paginator.GetSliceBounds(len(m.values))
 	paths := m.values[start:end]
 
-	m.renderTable(&b, paths)
+	m.renderTable(&b, paths, start)
 
 	return b.String()
 }
 
-func (m viewModel) renderTable(b *strings.Builder, paths []string) {
+func (m viewModel) renderTable(b *strings.Builder, paths []string, offset int) {
 	t := table.NewWriter()
-	t.AppendHeader(table.Row{"Dup #", "Bad", "Path"})
-	for _, path := range paths {
-		rep := " "
-		count := len(m.pathsLookup.Get(getAbsolutePath(path)))
-		if count > 1 {
-			rep = fmt.Sprint(count)
-		}
+	t.AppendHeader(table.Row{"#", "Dup[#]", "Bad", "Path"})
+	for i, path := range paths {
+		index := i + offset
+		pathKey := getAbsolutePath(path)
+		rep := m.getDuplicatesOf(pathKey, index)
 		t.AppendRow(table.Row{
+			index + 1,
 			rep,
 			statusOf(path),
 			path,
@@ -108,4 +108,19 @@ func (m viewModel) renderTable(b *strings.Builder, paths []string) {
 	b.WriteString("\n")
 
 	b.WriteString("  " + m.paginator.View())
+}
+
+func (m viewModel) getDuplicatesOf(pathKey string, index int) string {
+	instances := m.pathsLookup.Get(pathKey)
+	if len(instances) < 2 {
+		return ""
+	}
+	// return fmt.Sprint(instances)
+	s := set.NewMapset(instances...)
+	s.Remove(index)
+	pos := []string{}
+	s.Each(func(key int) {
+		pos = append(pos, fmt.Sprint(key+1))
+	})
+	return strings.Join(pos, ",")
 }

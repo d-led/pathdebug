@@ -29,7 +29,7 @@ pathdebug {nameOfEnvironmentVariable}
 ### Example
 
 ```bash
-SOME_PATH=/sbin:/a:/b:/a:/c:/d:/e:/f:/g \
+SOME_PATH='/sbin:~/.bashrc:/a:/b:/a:/c:/d:/e:/f:/g' \ 
 pathdebug SOME_PATH
 ```
 
@@ -37,13 +37,15 @@ pathdebug SOME_PATH
 
 ```text
 tap Esc/q/Ctrl-C to quit, <-/-> to paginate
-+-------+-----+-------+
-| DUP # | BAD | PATH  |
-+-------+-----+-------+
-|       |     | /sbin |
-| 2     | X   | /a    |
-|       | X   | /b    |
-| 2     | X   | /a    |
-+-------+-----+-------+
-  •○○
++---+--------+-----+-----------+
+| # | DUP[#] | BAD | PATH      |
++---+--------+-----+-----------+
+| 1 |        |     | /sbin     |
+| 2 |        | F   | ~/.bashrc |
+| 3 | 5      | X   | /a        |
+| 4 |        | X   | /b        |
+| 5 | 3      | X   | /a        |
+| 6 |        | X   | /c        |
++---+--------+-----+-----------+
+  •○
 ```
