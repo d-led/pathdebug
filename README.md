@@ -6,9 +6,17 @@ status: *untested, spike quality, use at your own peril*
 
 ## Install
 
-local: `go install .``
+from source:
 
-from github: `go install github.com/d-led/pathdebug@main`
+```bash
+go install
+```
+
+from github:
+
+```bash
+go install github.com/d-led/pathdebug@main`
+```
 
 ## Usage
 
