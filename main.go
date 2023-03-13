@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/paginator"
@@ -142,6 +143,8 @@ func (m model) View() string {
 
 	m.renderTable(&b, paths)
 
+	b.WriteString("\n" + version + "\n")
+
 	return b.String()
 }
 
@@ -184,3 +187,14 @@ func failWith(message string) {
 	fmt.Println(message)
 	os.Exit(1)
 }
+
+var version = func() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, setting := range info.Settings {
+			if setting.Key == "vcs.revision" {
+				return setting.Value
+			}
+		}
+	}
+	return "<unknown version>"
+}()
