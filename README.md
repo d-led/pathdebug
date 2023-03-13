@@ -19,8 +19,8 @@ pathdebug {nameOfEnvironmentVariable}
 ### Example
 
 ```bash
-export PATH=/sbin:/a:/b:/a:/c:/d:/e:/f:/g
-pathdebug PATH
+SOME_PATH=/sbin:/a:/b:/a:/c:/d:/e:/f:/g \
+pathdebug SOME_PATH
 ```
 
 &darr;
