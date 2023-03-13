@@ -18,6 +18,8 @@ from github:
 go install github.com/d-led/pathdebug@latest
 ```
 
+replace `latest` with the desired/latest commit hash if you had the tool installed already.
+
 ## Usage
 
 ```bash
