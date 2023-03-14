@@ -1,7 +1,6 @@
 package view
 
 import (
-	"fmt"
 	"math"
 	"os"
 	"strings"
@@ -9,7 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/paginator"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/d-led/pathdebug/common"
-	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/d-led/pathdebug/render"
 )
 
 func Run() error {
@@ -85,44 +84,10 @@ func (m viewModel) View() string {
 	start, end := m.paginator.GetSliceBounds(len(m.results))
 	results := m.results[start:end]
 
-	m.renderTable(&b, results, start)
+	render.RenderTable(&b, results)
+
+	b.WriteString("\n")
+	b.WriteString("  " + m.paginator.View())
 
 	return b.String()
-}
-
-func (m viewModel) renderTable(b *strings.Builder, results []common.ResultRow, offset int) {
-	t := table.NewWriter()
-	t.AppendHeader(table.Row{"#", "Dup[#]", "Bad", "Path"})
-	for _, row := range results {
-		t.AppendRow(table.Row{
-			row.Id,
-			formatDuplicates(row.Duplicates),
-			statusOfDir(row),
-			row.Path,
-		})
-	}
-	b.WriteString(t.Render())
-	b.WriteString("\n")
-
-	b.WriteString("  " + m.paginator.View())
-}
-
-func statusOfDir(row common.ResultRow) string {
-	if !row.Exists {
-		return "X"
-	}
-
-	if !row.IsDir {
-		return "F"
-	}
-
-	return " "
-}
-
-func formatDuplicates(ids []int) string {
-	res := []string{}
-	for _, id := range ids {
-		res = append(res, fmt.Sprint(id))
-	}
-	return strings.Join(res, ", ")
 }
