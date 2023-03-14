@@ -2,6 +2,13 @@
 
 a simple interactive [tui](https://en.wikipedia.org/wiki/Text-based_user_interface) to debug path list environment variables
 
+## Features
+
+- detect duplicate expanded path entries
+- detecting non-existent paths and files
+- interactive mode
+- noninteractive formatted output
+
 ## Install
 
 from source:
