@@ -1,4 +1,4 @@
-package main
+package view
 
 import (
 	"fmt"
@@ -8,25 +8,30 @@ import (
 
 	"github.com/charmbracelet/bubbles/paginator"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/d-led/pathdebug/common"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
+func Run() error {
+	p := tea.NewProgram(initialModel(), tea.WithAltScreen())
+	_, err := p.Run()
+	return err
+}
+
 type viewModel struct {
-	results   []resultRow
+	results   []common.ResultRow
 	paginator paginator.Model
 }
 
 func initialModel() viewModel {
-	if len(os.Args) != 2 {
-		failWith("please provide the name of the environment variable to debug")
-	}
-	source := newEnvSource(os.Args[1])
+	// args validated in the root command
+	source := common.NewEnvSource(os.Args[1])
 
-	fs := &osFilesystem{}
+	fs := &common.OsFilesystem{}
 
-	results, err := calculateResults(fs, source)
+	results, err := common.CalculateResults(fs, source)
 	if err != nil {
-		failWith(err.Error())
+		common.FailWith(err.Error())
 	}
 
 	p := paginator.New()
@@ -85,15 +90,15 @@ func (m viewModel) View() string {
 	return b.String()
 }
 
-func (m viewModel) renderTable(b *strings.Builder, results []resultRow, offset int) {
+func (m viewModel) renderTable(b *strings.Builder, results []common.ResultRow, offset int) {
 	t := table.NewWriter()
 	t.AppendHeader(table.Row{"#", "Dup[#]", "Bad", "Path"})
 	for _, row := range results {
 		t.AppendRow(table.Row{
-			row.id,
-			formatDuplicates(row.duplicates),
+			row.Id,
+			formatDuplicates(row.Duplicates),
 			statusOfDir(row),
-			row.path,
+			row.Path,
 		})
 	}
 	b.WriteString(t.Render())
@@ -102,12 +107,12 @@ func (m viewModel) renderTable(b *strings.Builder, results []resultRow, offset i
 	b.WriteString("  " + m.paginator.View())
 }
 
-func statusOfDir(row resultRow) string {
-	if !row.exists {
+func statusOfDir(row common.ResultRow) string {
+	if !row.Exists {
 		return "X"
 	}
 
-	if !row.isDir {
+	if !row.IsDir {
 		return "F"
 	}
 

@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"errors"
@@ -7,45 +7,45 @@ import (
 	"github.com/zyedidia/generic/set"
 )
 
-type resultRow struct {
-	id           int
-	path         string
-	expandedPath string
-	exists       bool
-	isDir        bool
-	duplicates   []int
+type ResultRow struct {
+	Id           int
+	Path         string
+	ExpandedPath string
+	Exists       bool
+	IsDir        bool
+	Duplicates   []int
 }
 
-func calculateResults(fs filesystem, source valueSource) ([]resultRow, error) {
-	values := source.values()
+func CalculateResults(fs Filesystem, source ValueSource) ([]ResultRow, error) {
+	values := source.Values()
 
 	if len(values) == 0 {
-		return nil, errors.New(source.source() + " is empty")
+		return nil, errors.New(source.Source() + " is empty")
 	}
 
 	duplicatePredicate := func(a, b int) bool { return true }
 	pathsLookup := multimap.NewMapSet[string](duplicatePredicate)
 	for i, path := range values {
-		pathKey := fs.getAbsolutePath(path)
+		pathKey := fs.GetAbsolutePath(path)
 		pathsLookup.Put(pathKey, i)
 	}
 
 	return calculateResultRows(fs, values, pathsLookup), nil
 }
 
-func calculateResultRows(fs filesystem, paths []string, pathsLookup multimap.MultiMap[string, int]) []resultRow {
-	res := []resultRow{}
+func calculateResultRows(fs Filesystem, paths []string, pathsLookup multimap.MultiMap[string, int]) []ResultRow {
+	res := []ResultRow{}
 	for index, path := range paths {
-		pathKey := fs.getAbsolutePath(path)
+		pathKey := fs.GetAbsolutePath(path)
 		dup := getDuplicatesOf(pathsLookup, pathKey, index)
-		exists, isdir := fs.pathStatus(pathKey)
-		res = append(res, resultRow{
-			id:           index + 1,
-			path:         path,
-			expandedPath: pathKey,
-			exists:       exists,
-			isDir:        isdir,
-			duplicates:   dup,
+		exists, isdir := fs.PathStatus(pathKey)
+		res = append(res, ResultRow{
+			Id:           index + 1,
+			Path:         path,
+			ExpandedPath: pathKey,
+			Exists:       exists,
+			IsDir:        isdir,
+			Duplicates:   dup,
 		})
 	}
 	return res

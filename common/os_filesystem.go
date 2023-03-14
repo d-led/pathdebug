@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"os"
@@ -7,9 +7,9 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-type osFilesystem struct{}
+type OsFilesystem struct{}
 
-func (*osFilesystem) getAbsolutePath(path string) string {
+func (*OsFilesystem) GetAbsolutePath(path string) string {
 	// homedir is assumed to work correctly
 	expandedPath, err := homedir.Expand(path)
 	if err == nil {
@@ -23,8 +23,8 @@ func (*osFilesystem) getAbsolutePath(path string) string {
 }
 
 // returns (exists, isDir)
-func (f *osFilesystem) pathStatus(path string) (bool, bool) {
-	path = f.getAbsolutePath(path)
+func (f *OsFilesystem) PathStatus(path string) (bool, bool) {
+	path = f.GetAbsolutePath(path)
 	fileInfo, err := os.Stat(path)
 	if err != nil {
 		return false, false

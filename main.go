@@ -1,12 +1,9 @@
 package main
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
+	"github.com/d-led/pathdebug/cmd"
 )
 
 func main() {
-	p := tea.NewProgram(initialModel(), tea.WithAltScreen())
-	if _, err := p.Run(); err != nil {
-		failWith("There's been an error: %v")
-	}
+	cmd.Execute()
 }

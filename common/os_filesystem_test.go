@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"fmt"
@@ -11,10 +11,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var sut filesystem = &osFilesystem{}
+var sut Filesystem = &OsFilesystem{}
 
 func Test_relative_paths_are_expanded(t *testing.T) {
-	assert.NotContains(t, "..", sut.getAbsolutePath(".."))
+	assert.NotContains(t, "..", sut.GetAbsolutePath(".."))
 }
 
 const interpolatedVar = "INTERPOLATED_VAR"
@@ -25,7 +25,7 @@ func Test_environment_vars_are_expanded(t *testing.T) {
 	part := "some_path"
 	fullPath := path.Join(getEnvVarPath(), part)
 
-	absPath := sut.getAbsolutePath(fullPath)
+	absPath := sut.GetAbsolutePath(fullPath)
 
 	assert.Contains(t, absPath, part)
 	assert.Contains(t, absPath, interpolatedValue)
@@ -33,13 +33,13 @@ func Test_environment_vars_are_expanded(t *testing.T) {
 }
 
 func Test_nonexistent_paths(t *testing.T) {
-	exists, _ := sut.pathStatus(sut.getAbsolutePath("some_nonexistent_path"))
+	exists, _ := sut.PathStatus(sut.GetAbsolutePath("some_nonexistent_path"))
 	assert.False(t, exists)
 }
 
 func Test_existing_directories(t *testing.T) {
 	// current path is assumed to exist
-	exists, isDir := sut.pathStatus(sut.getAbsolutePath("."))
+	exists, isDir := sut.PathStatus(sut.GetAbsolutePath("."))
 
 	assert.True(t, exists)
 	assert.True(t, isDir)
@@ -49,7 +49,7 @@ func Test_existing_files(t *testing.T) {
 	tempFile := createTempFile(t)
 	defer os.Remove(tempFile.Name())
 
-	exists, isDir := sut.pathStatus(tempFile.Name())
+	exists, isDir := sut.PathStatus(tempFile.Name())
 
 	assert.True(t, exists)
 	assert.False(t, isDir)
