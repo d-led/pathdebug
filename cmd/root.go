@@ -29,6 +29,12 @@ var (
 				}
 			case common.OutputTable:
 				fmt.Println(view.RenderTable())
+			case common.OutputJSON:
+				text, err := view.RenderJson()
+				if err != nil {
+					common.FailWith("Rendering JSON failed: " + err.Error())
+				}
+				fmt.Println(string(text))
 			default:
 				common.FailWith(fmt.Sprintf("output as %v not yet implemented", outputMode))
 			}

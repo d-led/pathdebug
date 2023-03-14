@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_relative_paths_are_expanded(t *testing.T) {
+func Test_table_rendering(t *testing.T) {
 	table := RenderTableToString([]common.ResultRow{
 		{Id: 42, Path: "/ok", Duplicates: []int{1, 2}, IsDir: true, Exists: true},
 		{Id: 33, Path: "/file", IsDir: false, Exists: true},

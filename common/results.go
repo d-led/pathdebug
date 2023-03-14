@@ -8,12 +8,12 @@ import (
 )
 
 type ResultRow struct {
-	Id           int
-	Path         string
-	ExpandedPath string
-	Exists       bool
-	IsDir        bool
-	Duplicates   []int
+	Id           int    `json:"id"`
+	Path         string `json:"path"`
+	ExpandedPath string `json:"expanded_path"`
+	Exists       bool   `json:"exists"`
+	IsDir        bool   `json:"is_dir"`
+	Duplicates   []int  `json:"duplicates"`
 }
 
 func CalculateResults(fs Filesystem, source ValueSource) ([]ResultRow, error) {
