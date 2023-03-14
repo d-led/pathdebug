@@ -3,45 +3,40 @@ package main
 import (
 	"fmt"
 	"math"
+	"os"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/paginator"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/zyedidia/generic/multimap"
-	"github.com/zyedidia/generic/set"
 )
 
 type viewModel struct {
-	values      []string
-	pathsLookup multimap.MultiMap[string, int]
-	paginator   paginator.Model
+	results   []resultRow
+	paginator paginator.Model
 }
 
 func initialModel() viewModel {
-	var source valueSource = newEnvSource()
-	values := source.values()
-
-	if len(values) == 0 {
-		failWith(source.source() + " is empty")
+	if len(os.Args) != 2 {
+		failWith("please provide the name of the environment variable to debug")
 	}
+	source := newEnvSource(os.Args[1])
 
-	duplicatePredicate := func(a, b int) bool { return true }
-	pathsLookup := multimap.NewMapSet[string](duplicatePredicate)
-	for i, path := range values {
-		pathKey := getAbsolutePath(path)
-		pathsLookup.Put(pathKey, i)
+	fs := &osFilesystem{}
+
+	results, err := calculateResults(fs, source)
+	if err != nil {
+		failWith(err.Error())
 	}
 
 	p := paginator.New()
 	p.Type = paginator.Dots
 	p.PerPage = 10
-	p.SetTotalPages(len(values))
+	p.SetTotalPages(len(results))
 
 	return viewModel{
-		values:      values,
-		pathsLookup: pathsLookup,
-		paginator:   p,
+		results:   results,
+		paginator: p,
 	}
 }
 
@@ -57,7 +52,7 @@ func (m viewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		const margin = 6
 		m.paginator.PerPage = int(math.Max(1, float64(msg.Height-margin)))
 		// re-calculate the paging state
-		m.paginator.SetTotalPages(len(m.values))
+		m.paginator.SetTotalPages(len(m.results))
 		// try to keep the page but choose another if necessary
 		m.paginator.Page = int(math.Min(math.Max(0, float64(m.paginator.Page)), float64(m.paginator.TotalPages-1)))
 
@@ -82,26 +77,23 @@ func (m viewModel) View() string {
 	b.WriteString(`tap Esc/q/Ctrl-C to quit, <-/-> to paginate
 `)
 
-	start, end := m.paginator.GetSliceBounds(len(m.values))
-	paths := m.values[start:end]
+	start, end := m.paginator.GetSliceBounds(len(m.results))
+	results := m.results[start:end]
 
-	m.renderTable(&b, paths, start)
+	m.renderTable(&b, results, start)
 
 	return b.String()
 }
 
-func (m viewModel) renderTable(b *strings.Builder, paths []string, offset int) {
+func (m viewModel) renderTable(b *strings.Builder, results []resultRow, offset int) {
 	t := table.NewWriter()
 	t.AppendHeader(table.Row{"#", "Dup[#]", "Bad", "Path"})
-	for i, path := range paths {
-		index := i + offset
-		pathKey := getAbsolutePath(path)
-		rep := m.getDuplicatesOf(pathKey, index)
+	for _, row := range results {
 		t.AppendRow(table.Row{
-			index + 1,
-			rep,
-			statusOf(path),
-			path,
+			row.id,
+			formatDuplicates(row.duplicates),
+			statusOfDir(row),
+			row.path,
 		})
 	}
 	b.WriteString(t.Render())
@@ -110,17 +102,22 @@ func (m viewModel) renderTable(b *strings.Builder, paths []string, offset int) {
 	b.WriteString("  " + m.paginator.View())
 }
 
-func (m viewModel) getDuplicatesOf(pathKey string, index int) string {
-	instances := m.pathsLookup.Get(pathKey)
-	if len(instances) < 2 {
-		return ""
+func statusOfDir(row resultRow) string {
+	if !row.exists {
+		return "X"
 	}
-	// return fmt.Sprint(instances)
-	s := set.NewMapset(instances...)
-	s.Remove(index)
-	pos := []string{}
-	s.Each(func(key int) {
-		pos = append(pos, fmt.Sprint(key+1))
-	})
-	return strings.Join(pos, ",")
+
+	if !row.isDir {
+		return "F"
+	}
+
+	return " "
+}
+
+func formatDuplicates(ids []int) string {
+	res := []string{}
+	for _, id := range ids {
+		res = append(res, fmt.Sprint(id))
+	}
+	return strings.Join(res, ", ")
 }

@@ -7,7 +7,10 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-func getAbsolutePath(path string) string {
+type osFilesystem struct{}
+
+func (*osFilesystem) getAbsolutePath(path string) string {
+	// homedir is assumed to work correctly
 	expandedPath, err := homedir.Expand(path)
 	if err == nil {
 		path = expandedPath
@@ -19,16 +22,17 @@ func getAbsolutePath(path string) string {
 	return os.ExpandEnv(path)
 }
 
-func statusOf(path string) string {
-	path = getAbsolutePath(path)
+// returns (exists, isDir)
+func (f *osFilesystem) pathStatus(path string) (bool, bool) {
+	path = f.getAbsolutePath(path)
 	fileInfo, err := os.Stat(path)
 	if err != nil {
-		return "X"
+		return false, false
 	}
 
 	if !fileInfo.IsDir() {
-		return "F"
+		return true, false
 	}
 
-	return " "
+	return true, true
 }

@@ -9,18 +9,14 @@ type envSource struct {
 	name string
 }
 
-func newEnvSource() *envSource {
-	if len(os.Args) != 2 {
-		failWith("please provide the name of the environment variable to debug")
-	}
-	return &envSource{os.Args[1]}
+func newEnvSource(varName string) *envSource {
+	return &envSource{varName}
 }
 
 func (s *envSource) values() []string {
-	paths := strings.Split(s.orig(), string(os.PathListSeparator))
-	if len(paths) == 1 && paths[0] == "" {
-		return []string{}
-	}
+	paths := strings.FieldsFunc(s.orig(), func(c rune) bool {
+		return c == os.PathListSeparator
+	})
 	return paths
 }
 
