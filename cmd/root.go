@@ -13,7 +13,7 @@ var (
 	outputMode common.Output = common.OutputInteractive
 
 	rootCmd = &cobra.Command{
-		Use:   "pathdebug {VAR_NAME}",
+		Use:   "pathdebug VAR_NAME",
 		Short: "Debug path lists (non-)interactively",
 		Args: func(cmd *cobra.Command, args []string) error {
 			if err := cobra.ExactArgs(1)(cmd, args); err != nil {
