@@ -20,15 +20,15 @@ func RenderTable(b *strings.Builder, results []common.ResultRow) {
 	for _, row := range results {
 		t.AppendRow(table.Row{
 			row.Id,
-			formatDuplicates(row.Duplicates),
-			statusOfDir(row),
+			FormatDuplicates(row.Duplicates),
+			StatusOfDir(row),
 			row.Path,
 		})
 	}
 	b.WriteString(t.Render())
 }
 
-func statusOfDir(row common.ResultRow) string {
+func StatusOfDir(row common.ResultRow) string {
 	if !row.Exists {
 		return "X"
 	}
@@ -40,7 +40,7 @@ func statusOfDir(row common.ResultRow) string {
 	return " "
 }
 
-func formatDuplicates(ids []int) string {
+func FormatDuplicates(ids []int) string {
 	res := []string{}
 	for _, id := range ids {
 		res = append(res, fmt.Sprint(id))

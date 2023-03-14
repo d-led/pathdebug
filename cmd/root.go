@@ -35,6 +35,8 @@ var (
 					common.FailWith("Rendering JSON failed: " + err.Error())
 				}
 				fmt.Println(string(text))
+			case common.OutputCSV:
+				fmt.Println(view.RenderCSV())
 			default:
 				common.FailWith(fmt.Sprintf("output as %v not yet implemented", outputMode))
 			}
