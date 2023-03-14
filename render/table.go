@@ -8,6 +8,12 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
+func RenderTableToString(results []common.ResultRow) string {
+	var b strings.Builder
+	RenderTable(&b, results)
+	return b.String()
+}
+
 func RenderTable(b *strings.Builder, results []common.ResultRow) {
 	t := table.NewWriter()
 	t.AppendHeader(table.Row{"#", "Dup[#]", "Bad", "Path"})

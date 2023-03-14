@@ -2,7 +2,6 @@ package view
 
 import (
 	"math"
-	"os"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/paginator"
@@ -23,15 +22,7 @@ type viewModel struct {
 }
 
 func initialModel() viewModel {
-	// args validated in the root command
-	source := common.NewEnvSource(os.Args[1])
-
-	fs := &common.OsFilesystem{}
-
-	results, err := common.CalculateResults(fs, source)
-	if err != nil {
-		common.FailWith(err.Error())
-	}
+	results := getResults()
 
 	p := paginator.New()
 	p.Type = paginator.Dots

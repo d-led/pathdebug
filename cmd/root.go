@@ -27,6 +27,8 @@ var (
 				if err := view.Run(); err != nil {
 					common.FailWith(fmt.Sprintf("There's been an error: %v", err.Error()))
 				}
+			case common.OutputTable:
+				fmt.Println(view.RenderTable())
 			default:
 				common.FailWith(fmt.Sprintf("output as %v not yet implemented", outputMode))
 			}
