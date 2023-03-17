@@ -28,6 +28,10 @@ go install github.com/d-led/pathdebug@latest
 
 replace `latest` with the desired/latest commit hash if you had the tool installed already.
 
+alternatively, download the binary from [Github releases](https://github.com/d-led/pathdebug/releases/).
+
+On OSX you might need to run `sudo xattr -d com.apple.quarantine pathdebug` on the downloaded binary.
+
 ## Usage
 
 ```bash
