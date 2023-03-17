@@ -1,6 +1,8 @@
 # pathdebug
 
-a simple interactive [tui](https://en.wikipedia.org/wiki/Text-based_user_interface) to debug path list environment variables
+a simple interactive & one-shot tool to debug path list environment variables
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/d-led/pathdebug)](https://goreportcard.com/report/github.com/d-led/pathdebug)
 
 ## Features
 
