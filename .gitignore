@@ -47,3 +47,5 @@ go.work
 
 pathdebug
 *.exe
+
+dist/
