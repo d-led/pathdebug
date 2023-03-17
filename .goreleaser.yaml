@@ -10,7 +10,7 @@ builds:
       - windows
       - darwin
     ldflags:
-      - -X github.com/d-led/pathdebug/common.Version={{.Env.VERSION}}
+      - -s -w -X github.com/d-led/pathdebug/common.Version={{.version}}
     ignore:
       - goarch: 386
 
