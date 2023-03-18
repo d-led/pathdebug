@@ -32,6 +32,13 @@ alternatively, download the binary from [Github releases](https://github.com/d-l
 
 On OSX you might need to run `sudo xattr -d com.apple.quarantine pathdebug` on the downloaded binary.
 
+### Homebrew
+
+```bash
+brew tap d-led/d-led
+brew install pathdebug
+```
+
 ## Usage
 
 ```bash
