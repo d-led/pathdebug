@@ -39,6 +39,20 @@ changelog:
       - '^docs:'
       - '^test:'
 
+universal_binaries:
+  - replace: true
+
+brews:
+  -
+    name: pathdebug
+    homepage: "https://github.com/d-led/pathdebug"
+    tap:
+      owner: d-led
+      name: homebrew-d-led
+    commit_author:
+      name: Dmitry Ledentsov
+      email: dmlled@yahoo.com
+
 # The lines beneath this are called `modelines`. See `:help modeline`
 # Feel free to remove those if you don't want/use them.
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
