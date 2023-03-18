@@ -22,6 +22,12 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: stable
+      -
+        name: Choco help
+        # install choco
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: -h
       - uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser
