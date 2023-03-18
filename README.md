@@ -84,6 +84,6 @@ pathdebug SOME_PATH -o table
 
 see help for other formats
 
-
 ## License
+
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fd-led%2Fpathdebug.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fd-led%2Fpathdebug?ref=badge_large)
