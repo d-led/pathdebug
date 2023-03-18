@@ -53,6 +53,31 @@ brews:
       name: Dmitry Ledentsov
       email: dmlled@yahoo.com
 
+chocolateys:
+  -
+    name: pathdebug
+    owners: Dmitry Ledentsov
+    authors: Dmitry Ledentsov
+    project_url: https://github.com/d-led/pathdebug
+    project_source_url: https://github.com/d-led/pathdebug
+    docs_url: https://github.com/d-led/pathdebug
+    url_template: "https://github.com/d-led/pathdebug/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    copyright: 2023 Dmitry Ledentsov
+    license_url: https://github.com/d-led/pathdebug/blob/main/LICENSE
+    bug_tracker_url: https://github.com/d-led/pathdebug/issues
+    tags: "environment variable path debug"
+    summary: A simple interactive & one-shot tool to debug path list environment variables.
+    description: |
+      {{ .ProjectName }} installer package.
+      A simple interactive & one-shot tool to debug path list environment variables.
+    release_notes: "https://github.com/d-led/pathdebug/releases/tag/v{{ .Version }}"
+
+    api_key: '{{ .Env.CHOCOLATEY_API_KEY }}'
+    source_repo: "https://push.chocolatey.org/"
+    skip_publish: false
+    goamd64: v1
+
+
 # The lines beneath this are called `modelines`. See `:help modeline`
 # Feel free to remove those if you don't want/use them.
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
