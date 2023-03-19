@@ -6,6 +6,10 @@ a simple interactive & one-shot tool to debug path list environment variables
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fd-led%2Fpathdebug.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fd-led%2Fpathdebug?ref=badge_shield)
 [![Test](https://github.com/d-led/pathdebug/actions/workflows/test.yml/badge.svg)](https://github.com/d-led/pathdebug/actions/workflows/test.yml)
 
+```bash
+pathdebug {EnvironmentVariableName}
+```
+
 ## Features
 
 - detect duplicate expanded path entries
@@ -15,7 +19,14 @@ a simple interactive & one-shot tool to debug path list environment variables
 
 ## Install
 
-from source:
+### Homebrew
+
+```bash
+brew tap d-led/d-led
+brew install pathdebug
+```
+
+### From Source
 
 ```bash
 go install
@@ -27,24 +38,11 @@ from github:
 go install github.com/d-led/pathdebug@latest
 ```
 
-replace `latest` with the desired/latest commit hash if you had the tool installed already.
-
-alternatively, download the binary from [Github releases](https://github.com/d-led/pathdebug/releases/).
+Alternatively, download the binary from [Github releases](https://github.com/d-led/pathdebug/releases/).
 
 On OSX you might need to run `sudo xattr -d com.apple.quarantine pathdebug` on the downloaded binary.
 
-### Homebrew
-
-```bash
-brew tap d-led/d-led
-brew install pathdebug
-```
-
 ## Usage
-
-```bash
-pathdebug {nameOfEnvironmentVariable}
-```
 
 help:
 
