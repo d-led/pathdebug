@@ -43,6 +43,16 @@ Alternatively, download the binary from [Github releases](https://github.com/d-l
 
 On OSX you might need to run `sudo xattr -d com.apple.quarantine pathdebug` on the downloaded binary.
 
+### Download Latest Release
+
+OSX:
+
+```bash
+curl -s -L https://github.com/d-led/pathdebug/releases/download/v0.1.4/pathdebug_Darwin_all.tar.gz | tar xvz - pathdebug
+```
+
+Linux: same procedure, but substitute the artifact name with the appropriate one.
+
 ## Usage
 
 help:
