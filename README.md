@@ -27,6 +27,14 @@ brew tap d-led/d-led
 brew install pathdebug
 ```
 
+### Chocolatey
+
+```shell
+choco install pathdebug
+```
+
+see package at [Chocolatey](https://community.chocolatey.org/packages/pathdebug)
+
 ### From Source
 
 ```bash
