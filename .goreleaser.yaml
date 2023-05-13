@@ -70,6 +70,7 @@ chocolateys:
     description: |
       {{ .ProjectName }} installer package.
       A simple interactive & one-shot tool to debug path list environment variables.
+      USAGE: `pathdebug PATH` or `pathdebug --h` for more options
     release_notes: "https://github.com/d-led/pathdebug/releases/tag/v{{ .Version }}"
 
     api_key: '{{ .Env.CHOCOLATEY_API_KEY }}'
