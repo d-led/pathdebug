@@ -16,7 +16,7 @@ func RenderCSV() string {
 	for _, row := range getResults() {
 		w.Write([]string{
 			fmt.Sprint(row.Id),
-			render.FormatDuplicates(row.Duplicates),
+			render.FormatList(row.Duplicates),
 			render.StatusOfDir(row),
 			row.Path,
 		})

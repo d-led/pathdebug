@@ -20,7 +20,7 @@ func RenderTable(b *strings.Builder, results []common.ResultRow) {
 	for _, row := range results {
 		t.AppendRow(table.Row{
 			row.Id,
-			FormatDuplicates(row.Duplicates),
+			FormatList(row.Duplicates),
 			StatusOfDir(row),
 			row.Path,
 		})
@@ -40,7 +40,7 @@ func StatusOfDir(row common.ResultRow) string {
 	return " "
 }
 
-func FormatDuplicates(ids []int) string {
+func FormatList[T any](ids []T) string {
 	res := []string{}
 	for _, id := range ids {
 		res = append(res, fmt.Sprint(id))
