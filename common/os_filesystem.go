@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
+	"go.spiff.io/expand"
 )
 
 type OsFilesystem struct{}
@@ -19,7 +20,7 @@ func (*OsFilesystem) GetAbsolutePath(path string) string {
 	if err == nil {
 		path = absPath
 	}
-	return os.ExpandEnv(path)
+	return expand.Expand(path, os.LookupEnv)
 }
 
 // returns (exists, isDir)

@@ -63,7 +63,7 @@ func getEnvVarPath() string {
 	if runtime.GOOS == "windows" {
 		return "%" + interpolatedVar + "%"
 	}
-	return fmt.Sprintf("${%s}", interpolatedVar)
+	return fmt.Sprintf("${%s:-shouldNotMatter}", interpolatedVar)
 }
 
 func createTempFile(t *testing.T) *os.File {
