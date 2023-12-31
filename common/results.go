@@ -38,7 +38,7 @@ func NewCustomResultsCalculator(fs Filesystem, source ValueSource, candidateSour
 }
 
 func NewResultsCalculator(fs Filesystem, source ValueSource) *ResultsCalculator {
-	return NewCustomResultsCalculator(fs, source, NewNixCandidateSource(fs))
+	return NewCustomResultsCalculator(fs, source, NewNixCandidateSource(fs, source.Source()))
 }
 
 func (r *ResultsCalculator) CalculateResults() ([]ResultRow, error) {
