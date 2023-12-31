@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -71,4 +72,12 @@ func createTempFile(t *testing.T) *os.File {
 	require.NoError(t, err)
 	fmt.Println(tempFile.Name())
 	return tempFile
+}
+
+func Test_expanding_home_variable(t *testing.T) {
+	if os.Getenv("HOME") == "" {
+		os.Setenv("HOME", "/home")
+	}
+	expanded := sut.GetAbsolutePath("$HOME/.test/env")
+	assert.True(t, strings.HasSuffix(expanded, "/.test/env"))
 }

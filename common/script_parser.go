@@ -15,7 +15,7 @@ func ForEachVariableAssignment(key, input string, fn func(string)) {
 	syntax.Walk(f, func(node syntax.Node) bool {
 		switch x := node.(type) {
 		case *syntax.Assign:
-			if key == x.Name.Value {
+			if x.Name != nil && key == x.Name.Value && x.Value != nil {
 				value := input[x.Value.Pos().Offset():x.Value.End().Offset()]
 				fn(value)
 			}
@@ -39,7 +39,7 @@ func ForEachSourcedScript(input string, fn func(string)) {
 	syntax.Walk(f, func(node syntax.Node) bool {
 		switch x := node.(type) {
 		case *syntax.CallExpr:
-			if len(x.Args) == 2 {
+			if len(x.Args) >= 2 {
 				cmd := input[x.Args[0].Pos().Offset():x.Args[0].End().Offset()]
 				cmd = strings.TrimLeft(cmd, "\\")
 

@@ -40,26 +40,48 @@ func (s *NixCandidateSource) WhereSet(somePath string) *PathSetIn {
 }
 
 func (s *NixCandidateSource) crawlKnownPaths() {
-	ForEachKnownPath(func(originalSource, expandedSource string) {
-		if s.expandedPathsAlreadyCrawled[expandedSource] {
-			return
-		}
-		// do not crawl this file again
-		s.expandedPathsAlreadyCrawled[expandedSource] = true
+	ForEachKnownPath(s.crawlSource)
+}
 
-		// try getting the contents
-		input, err := readAllText(expandedSource)
-		if err != nil {
-			return
-		}
+func (s *NixCandidateSource) crawlSource(originalSource, expandedSource string) {
+	if s.expandedPathsAlreadyCrawled[expandedSource] || isDir(expandedSource) {
+		return
+	}
+	// do not crawl this file again
+	s.expandedPathsAlreadyCrawled[expandedSource] = true
 
-		ForEachVariableAssignment(s.key, input, func(value string) {
-			harvestedPaths := s.harvestPaths(value)
-			for _, harvestedPath := range harvestedPaths {
-				s.tryUpdatePathMap(harvestedPath, originalSource, expandedSource)
-			}
-		})
+	// try getting the contents
+	input, err := readAllText(expandedSource)
+	if err != nil {
+		return
+	}
+
+	ForEachVariableAssignment(s.key, input, func(value string) {
+		harvestedPaths := s.harvestPaths(value)
+		for _, harvestedPath := range harvestedPaths {
+			s.tryUpdatePathMap(harvestedPath, originalSource, expandedSource)
+		}
 	})
+
+	sourcedQueue := []string{}
+
+	ForEachSourcedScript(input, func(sourcedPath string) {
+		normalizedSourcedPath := s.fs.GetAbsolutePath(sourcedPath)
+		if s.expandedPathsAlreadyCrawled[normalizedSourcedPath] {
+			return
+		}
+		sourcedQueue = append(sourcedQueue, sourcedPath)
+	})
+
+	for {
+		if len(sourcedQueue) == 0 {
+			break
+		}
+		next := sourcedQueue[0]
+		sourcedQueue = sourcedQueue[1:]
+		s.crawlSource(next, s.fs.GetAbsolutePath(next))
+	}
+
 }
 
 func (s *NixCandidateSource) tryUpdatePathMap(harvestedPath string, originalSource string, expandedSource string) {
@@ -93,14 +115,17 @@ func (s *NixCandidateSource) crawlPathLists() {
 
 // input is some path definition
 func (s *NixCandidateSource) harvestPaths(input string) []string {
+	input = fixHomeExpansion(input)
 	input = strings.TrimSpace(input)
 	input = strings.Trim(input, fmt.Sprintf("%v\"'", os.PathListSeparator))
 	inputExpanded := expand.Expand(input, func(key string) (value string, ok bool) {
+		switch key {
 		// do not expand the desired variable itself
-		if key == s.key {
+		case s.key:
 			return "", false
+		default:
+			return os.LookupEnv(key)
 		}
-		return os.LookupEnv(key)
 	})
 	all := strings.Split(inputExpanded, fmt.Sprintf("%c", os.PathListSeparator))
 	res := hashset.New[string](uint64(len(all)), g.Equals[string], g.HashString)
@@ -140,4 +165,12 @@ func appendIfNotInSlice[T any](input []T, value T, eq func(T, T) bool) []T {
 	}
 
 	return res
+}
+
+func isDir(p string) bool {
+	f, err := os.Stat(p)
+	if err != nil {
+		return false
+	}
+	return f.IsDir()
 }
