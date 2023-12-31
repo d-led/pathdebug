@@ -12,6 +12,7 @@ type OsFilesystem struct{}
 
 func (*OsFilesystem) GetAbsolutePath(path string) string {
 	// homedir is assumed to work correctly
+	path = FixHomeExpansion(path)
 	path = ConvertSimpleVarsToBraces(path)
 	expandedPath, err := homedir.Expand(path)
 	if err == nil {

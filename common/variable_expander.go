@@ -10,6 +10,7 @@ import (
 )
 
 func CustomExpandVariables(input string, fn func(key string) (value string, ok bool)) string {
+	input = FixHomeExpansion(input)
 	input = ConvertSimpleVarsToBraces(input)
 	input = strings.TrimSpace(input)
 	input = strings.Trim(input, fmt.Sprintf("%v\"'", os.PathListSeparator))
@@ -22,4 +23,10 @@ func ConvertSimpleVarsToBraces(input string) string {
 		parts := r.FindStringSubmatch(m)
 		return fmt.Sprintf(`${%s}`, parts[1])
 	})
+}
+
+func FixHomeExpansion(path string) string {
+	path = strings.ReplaceAll(path, "$HOME/", "~/")
+	path = strings.ReplaceAll(path, "${HOME}/", "~/")
+	return path
 }
