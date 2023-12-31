@@ -36,18 +36,20 @@ func NewResultsCalculator(fs Filesystem, source ValueSource) *ResultsCalculator 
 }
 
 func (r *ResultsCalculator) CalculateResults() ([]ResultRow, error) {
-	values := r.source.Values()
-
-	if len(values) == 0 {
+	if len(r.source.Values()) == 0 {
 		return nil, errors.New(r.source.Source() + " is empty")
 	}
 
-	for i, path := range values {
+	r.calculatePathPositionLookup()
+
+	return r.calculateResultRows(), nil
+}
+
+func (r *ResultsCalculator) calculatePathPositionLookup() {
+	for i, path := range r.source.Values() {
 		pathKey := r.fs.GetAbsolutePath(path)
 		r.pathsLookup.Put(pathKey, i)
 	}
-
-	return r.calculateResultRows(), nil
 }
 
 func (r *ResultsCalculator) calculateResultRows() []ResultRow {
