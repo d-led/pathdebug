@@ -1,6 +1,7 @@
 package render
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/d-led/pathdebug/common"
@@ -21,4 +22,16 @@ func Test_table_rendering(t *testing.T) {
 	assert.Contains(t, table, "1, 2")
 	assert.Contains(t, table, "F")
 	assert.Contains(t, table, "X")
+}
+
+func Test_rendering_candidate_sources(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.SkipNow()
+	}
+	table := RenderTableToString([]common.ResultRow{
+		{Id: 42, Path: "/ok", CandidateSources: []string{".mySource"}},
+	})
+
+	assert.Contains(t, table, "/ok")
+	assert.Contains(t, table, ".mySource")
 }
