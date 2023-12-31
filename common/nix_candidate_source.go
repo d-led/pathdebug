@@ -25,7 +25,8 @@ func NewNixCandidateSource(fs Filesystem, key string) CandidateSource {
 		sources: map[string]*PathSetIn{},
 		key:     key,
 	}
-	res.precompute()
+	res.crawlKnownPaths()
+	res.crawlPathLists()
 	return res
 }
 
@@ -37,7 +38,7 @@ func (s *NixCandidateSource) WhereSet(somePath string) *PathSetIn {
 	return s.sources[normalizedPath]
 }
 
-func (s *NixCandidateSource) precompute() {
+func (s *NixCandidateSource) crawlKnownPaths() {
 	ForEachKnownPath(func(originalSource, expandedSource string) {
 		// try getting the contents
 		input, err := readAllText(expandedSource)
@@ -58,28 +59,41 @@ func (s *NixCandidateSource) precompute() {
 				if s.key == x.Name.Value {
 					harvestedPaths := s.harvestPaths(input[x.Value.Pos().Offset():x.Value.End().Offset()])
 					for _, harvestedPath := range harvestedPaths {
-						foundNormalizedPath := s.fs.GetAbsolutePath(harvestedPath)
-						sourcesForPath := s.sources[foundNormalizedPath]
-						if sourcesForPath == nil {
-							sourcesForPath = &PathSetIn{
-								What:     Location{harvestedPath, foundNormalizedPath},
-								WhereSet: []Location{},
-							}
-						}
-						sourcesForPath.WhereSet = appendIfNotInSlice(
-							sourcesForPath.WhereSet,
-							Location{
-								originalSource,
-								expandedSource,
-							}, func(a, b Location) bool {
-								return a.Expanded == b.Expanded && a.Original == b.Original
-							})
-						s.sources[foundNormalizedPath] = sourcesForPath
+						s.tryUpdatePathMap(harvestedPath, originalSource, expandedSource)
 					}
 				}
 			}
 			return true
 		})
+	})
+}
+
+func (s *NixCandidateSource) tryUpdatePathMap(harvestedPath string, originalSource string, expandedSource string) {
+	foundNormalizedPath := s.fs.GetAbsolutePath(harvestedPath)
+	sourcesForPath := s.sources[foundNormalizedPath]
+	if sourcesForPath == nil {
+		sourcesForPath = &PathSetIn{
+			What:     Location{harvestedPath, foundNormalizedPath},
+			WhereSet: []Location{},
+		}
+	}
+	sourcesForPath.WhereSet = appendIfNotInSlice(
+		sourcesForPath.WhereSet,
+		Location{
+			originalSource,
+			expandedSource,
+		}, func(a, b Location) bool {
+			return a.Expanded == b.Expanded && a.Original == b.Original
+		})
+	s.sources[foundNormalizedPath] = sourcesForPath
+}
+
+func (s *NixCandidateSource) crawlPathLists() {
+	if runtime.GOOS == "windows" {
+		return
+	}
+	ForEachPathsDPath(func(source, path string) {
+		s.tryUpdatePathMap(path, source, source)
 	})
 }
 
