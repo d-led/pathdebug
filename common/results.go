@@ -22,17 +22,23 @@ type positionLookup multimap.MultiMap[string, int]
 func duplicatePredicate(a, b int) bool { return true }
 
 type ResultsCalculator struct {
-	fs          Filesystem
-	source      ValueSource
-	pathsLookup positionLookup
+	fs              Filesystem
+	source          ValueSource
+	pathsLookup     positionLookup
+	candidateSource CandidateSource
+}
+
+func NewCustomResultsCalculator(fs Filesystem, source ValueSource, candidateSource CandidateSource) *ResultsCalculator {
+	return &ResultsCalculator{
+		fs:              fs,
+		source:          source,
+		pathsLookup:     multimap.NewMapSet[string](duplicatePredicate),
+		candidateSource: candidateSource,
+	}
 }
 
 func NewResultsCalculator(fs Filesystem, source ValueSource) *ResultsCalculator {
-	return &ResultsCalculator{
-		fs:          fs,
-		source:      source,
-		pathsLookup: multimap.NewMapSet[string](duplicatePredicate),
-	}
+	return NewCustomResultsCalculator(fs, source, NewNixCandidateSource(fs))
 }
 
 func (r *ResultsCalculator) CalculateResults() ([]ResultRow, error) {
@@ -59,16 +65,30 @@ func (r *ResultsCalculator) calculateResultRows() []ResultRow {
 		pathKey := r.fs.GetAbsolutePath(path)
 		dup := getDuplicatesOf(r.pathsLookup, pathKey, index)
 		exists, isdir := r.fs.PathStatus(pathKey)
+		candidateSources := r.getCandidateSourcesFor(path)
 		res = append(res, ResultRow{
-			Id:           index + 1,
-			Path:         path,
-			ExpandedPath: pathKey,
-			Exists:       exists,
-			IsDir:        isdir,
-			Duplicates:   dup,
+			Id:               index + 1,
+			Path:             path,
+			ExpandedPath:     pathKey,
+			Exists:           exists,
+			IsDir:            isdir,
+			Duplicates:       dup,
+			CandidateSources: candidateSources,
 		})
 	}
 	return res
+}
+
+func (r *ResultsCalculator) getCandidateSourcesFor(path string) []string {
+	res := r.candidateSource.WhereSet(path)
+	if res == nil {
+		return nil
+	}
+	candidateSources := []string{}
+	for _, source := range res.WhereSet {
+		candidateSources = append(candidateSources, source.Original)
+	}
+	return candidateSources
 }
 
 // returns the IDs of the duplicate indices (== index+1)

@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -63,6 +64,34 @@ func Test_no_duplicates(t *testing.T) {
 	mockFs.AssertExpectations(t)
 }
 
+func Test_candidate_sources_not_empty_when_found(t *testing.T) {
+	mockFs := new(mockFilesystem)
+
+	// setup expectations
+	mockFs.On("GetAbsolutePath", "a").Return("a")
+	mockFs.On("GetAbsolutePath", "b").Return("b")
+	mockFs.On("PathStatus", mock.Anything).Return(true, true)
+
+	sut := NewCustomResultsCalculator(mockFs, &mockValueSource{values_: []string{
+		"a",
+		"b",
+	}}, &mockCandidateSource{
+		map_: map[string]*PathSetIn{
+			// a is found, but not b
+			"a": {
+				What: Location{"a", "a"},
+				WhereSet: []Location{
+					{"a", "a"},
+				},
+			},
+		},
+	})
+	rows, _ := sut.CalculateResults()
+	require.Len(t, rows[0].CandidateSources, 1)
+	assert.Equal(t, "a", rows[0].CandidateSources[0])
+	assert.Nil(t, rows[1].CandidateSources)
+}
+
 type mockFilesystem struct {
 	mock.Mock
 }
@@ -93,4 +122,13 @@ func (m *mockValueSource) Orig() string {
 
 func (m *mockValueSource) Values() []string {
 	return m.values_
+}
+
+type mockCandidateSource struct {
+	map_ map[string]*PathSetIn
+}
+
+func (s *mockCandidateSource) WhereSet(somePath string) *PathSetIn {
+	fmt.Println("TRYING", somePath, s.map_[somePath])
+	return s.map_[somePath]
 }

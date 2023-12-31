@@ -11,5 +11,5 @@ type PathSetIn struct {
 }
 
 type CandidateSource interface {
-	WhereSet(somePath string) PathSetIn
+	WhereSet(somePath string) *PathSetIn
 }
