@@ -17,29 +17,46 @@ type ResultRow struct {
 	CandidateSources []string `json:"candidate_sources,omitempty"`
 }
 
-func CalculateResults(fs Filesystem, source ValueSource) ([]ResultRow, error) {
-	values := source.Values()
+type positionLookup multimap.MultiMap[string, int]
 
-	if len(values) == 0 {
-		return nil, errors.New(source.Source() + " is empty")
-	}
+func duplicatePredicate(a, b int) bool { return true }
 
-	duplicatePredicate := func(a, b int) bool { return true }
-	pathsLookup := multimap.NewMapSet[string](duplicatePredicate)
-	for i, path := range values {
-		pathKey := fs.GetAbsolutePath(path)
-		pathsLookup.Put(pathKey, i)
-	}
-
-	return calculateResultRows(fs, values, pathsLookup), nil
+type ResultsCalculator struct {
+	fs          Filesystem
+	source      ValueSource
+	pathsLookup positionLookup
 }
 
-func calculateResultRows(fs Filesystem, paths []string, pathsLookup multimap.MultiMap[string, int]) []ResultRow {
+func NewResultsCalculator(fs Filesystem, source ValueSource) *ResultsCalculator {
+	return &ResultsCalculator{
+		fs:          fs,
+		source:      source,
+		pathsLookup: multimap.NewMapSet[string](duplicatePredicate),
+	}
+}
+
+func (r *ResultsCalculator) CalculateResults() ([]ResultRow, error) {
+	values := r.source.Values()
+
+	if len(values) == 0 {
+		return nil, errors.New(r.source.Source() + " is empty")
+	}
+
+	for i, path := range values {
+		pathKey := r.fs.GetAbsolutePath(path)
+		r.pathsLookup.Put(pathKey, i)
+	}
+
+	return r.calculateResultRows(), nil
+}
+
+func (r *ResultsCalculator) calculateResultRows() []ResultRow {
+	paths := r.source.Values()
 	res := []ResultRow{}
 	for index, path := range paths {
-		pathKey := fs.GetAbsolutePath(path)
-		dup := getDuplicatesOf(pathsLookup, pathKey, index)
-		exists, isdir := fs.PathStatus(pathKey)
+		pathKey := r.fs.GetAbsolutePath(path)
+		dup := getDuplicatesOf(r.pathsLookup, pathKey, index)
+		exists, isdir := r.fs.PathStatus(pathKey)
 		res = append(res, ResultRow{
 			Id:           index + 1,
 			Path:         path,

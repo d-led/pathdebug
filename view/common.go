@@ -12,7 +12,9 @@ func getResults() []common.ResultRow {
 
 	fs := &common.OsFilesystem{}
 
-	results, err := common.CalculateResults(fs, source)
+	resultsCalculator := common.NewResultsCalculator(fs, source)
+
+	results, err := resultsCalculator.CalculateResults()
 	if err != nil {
 		common.FailWith(err.Error())
 	}
