@@ -10,20 +10,21 @@ import (
 
 	g "github.com/zyedidia/generic"
 	"github.com/zyedidia/generic/hashset"
-	"mvdan.cc/sh/v3/syntax"
 )
 
 type NixCandidateSource struct {
-	fs      Filesystem
-	sources map[string]*PathSetIn
-	key     string
+	fs                          Filesystem
+	sources                     map[string]*PathSetIn
+	expandedPathsAlreadyCrawled map[string]bool
+	key                         string
 }
 
 func NewNixCandidateSource(fs Filesystem, key string) CandidateSource {
 	res := &NixCandidateSource{
-		fs:      fs,
-		sources: map[string]*PathSetIn{},
-		key:     key,
+		fs:                          fs,
+		sources:                     map[string]*PathSetIn{},
+		expandedPathsAlreadyCrawled: map[string]bool{},
+		key:                         key,
 	}
 	res.crawlKnownPaths()
 	res.crawlPathLists()
@@ -40,30 +41,23 @@ func (s *NixCandidateSource) WhereSet(somePath string) *PathSetIn {
 
 func (s *NixCandidateSource) crawlKnownPaths() {
 	ForEachKnownPath(func(originalSource, expandedSource string) {
+		if s.expandedPathsAlreadyCrawled[expandedSource] {
+			return
+		}
+		// do not crawl this file again
+		s.expandedPathsAlreadyCrawled[expandedSource] = true
+
 		// try getting the contents
 		input, err := readAllText(expandedSource)
 		if err != nil {
 			return
 		}
 
-		// parse
-		r := strings.NewReader(input)
-		f, err := syntax.NewParser().Parse(r, "")
-		if err != nil {
-			return
-		}
-
-		syntax.Walk(f, func(node syntax.Node) bool {
-			switch x := node.(type) {
-			case *syntax.Assign:
-				if s.key == x.Name.Value {
-					harvestedPaths := s.harvestPaths(input[x.Value.Pos().Offset():x.Value.End().Offset()])
-					for _, harvestedPath := range harvestedPaths {
-						s.tryUpdatePathMap(harvestedPath, originalSource, expandedSource)
-					}
-				}
+		ForEachVariableAssignment(s.key, input, func(value string) {
+			harvestedPaths := s.harvestPaths(value)
+			for _, harvestedPath := range harvestedPaths {
+				s.tryUpdatePathMap(harvestedPath, originalSource, expandedSource)
 			}
-			return true
 		})
 	})
 }
