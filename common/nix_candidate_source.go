@@ -6,8 +6,6 @@ import (
 	"runtime"
 	"strings"
 
-	"go.spiff.io/expand"
-
 	g "github.com/zyedidia/generic"
 	"github.com/zyedidia/generic/hashset"
 )
@@ -115,10 +113,8 @@ func (s *NixCandidateSource) crawlPathLists() {
 
 // input is some path definition
 func (s *NixCandidateSource) harvestPaths(input string) []string {
-	input = fixHomeExpansion(input)
-	input = strings.TrimSpace(input)
-	input = strings.Trim(input, fmt.Sprintf("%v\"'", os.PathListSeparator))
-	inputExpanded := expand.Expand(input, func(key string) (value string, ok bool) {
+
+	inputExpanded := CustomExpandVariables(input, func(key string) (value string, ok bool) {
 		switch key {
 		// do not expand the desired variable itself
 		case s.key:
