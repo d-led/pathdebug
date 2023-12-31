@@ -9,7 +9,8 @@ import (
 )
 
 func Test_empty_results_cannot_be_summarized(t *testing.T) {
-	_, err := CalculateResults(&mockFilesystem{}, &mockValueSource{})
+	sut := NewResultsCalculator(&mockFilesystem{}, &mockValueSource{})
+	_, err := sut.CalculateResults()
 	assert.Error(t, err)
 }
 
@@ -20,10 +21,11 @@ func Test_duplicates_have_correct_ids(t *testing.T) {
 	mockFs.On("GetAbsolutePath", mock.Anything).Return("a")
 	mockFs.On("PathStatus", mock.Anything).Return(true, true)
 
-	rows, err := CalculateResults(mockFs, &mockValueSource{values_: []string{
+	sut := NewResultsCalculator(mockFs, &mockValueSource{values_: []string{
 		"a",
 		"a",
 	}})
+	rows, err := sut.CalculateResults()
 	require.NoError(t, err)
 	require.Len(t, rows, 2)
 
@@ -51,10 +53,11 @@ func Test_no_duplicates(t *testing.T) {
 	mockFs.On("GetAbsolutePath", "b").Return("b")
 	mockFs.On("PathStatus", mock.Anything).Return(true, true)
 
-	rows, _ := CalculateResults(mockFs, &mockValueSource{values_: []string{
+	sut := NewResultsCalculator(mockFs, &mockValueSource{values_: []string{
 		"a",
 		"b",
 	}})
+	rows, _ := sut.CalculateResults()
 	assert.Empty(t, rows[0].Duplicates)
 	assert.Empty(t, rows[1].Duplicates)
 	mockFs.AssertExpectations(t)
