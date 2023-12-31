@@ -15,6 +15,10 @@ pathdebug {EnvironmentVariableName}
 
 - detect duplicate expanded path entries
 - detecting non-existent paths and files
+- best effort of **finding out where the path is set**
+  - [known startup script locations](common/known_paths.go), such as `.bashrc`
+  - `/etc/path.d` path lists
+  - to do: recursive follow-ups of `source $file`-like statements in the above scripts
 - interactive mode
 - noninteractive formatted output
 
