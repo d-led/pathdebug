@@ -7,11 +7,13 @@ import (
 var knownPaths = []string{
 	// global
 	"/etc/profile",
+	"/etc/environment",
 	"/etc/zprofile",
 	"/etc/zlogin",
 	"/etc/zshenv",
 	// generic
 	"~/.profile",
+	"~/.pam_environment",
 	// zsh: https://zsh.sourceforge.io/Doc/Release/Files.html#Startup_002fShutdown-Files
 	"~/.zshenv",
 	"~/.zprofile",
