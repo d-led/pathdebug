@@ -26,6 +26,7 @@ func NewNixCandidateSource(fs Filesystem, key string) CandidateSource {
 	}
 	res.crawlKnownPaths()
 	res.crawlPathLists()
+	res.crawlPathScriptDirs()
 	return res
 }
 
@@ -108,6 +109,15 @@ func (s *NixCandidateSource) crawlPathLists() {
 	}
 	ForEachPathsDPath(func(source, path string) {
 		s.tryUpdatePathMap(path, source, source)
+	})
+}
+
+func (s *NixCandidateSource) crawlPathScriptDirs() {
+	if runtime.GOOS == "windows" {
+		return
+	}
+	ForEachScriptsDPath(func(script, expandedScript string) {
+		s.crawlSource(script, expandedScript)
 	})
 }
 
