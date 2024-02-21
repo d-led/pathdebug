@@ -2,6 +2,7 @@ before:
   hooks:
     - go mod tidy
     - go test ./...
+    - go install mvdan.cc/garble@latest
 builds:
   - env:
       - CGO_ENABLED=0
@@ -11,8 +12,7 @@ builds:
       - darwin
     ldflags:
       - -s -w -X github.com/d-led/pathdebug/common.Version={{.Version}}
-    ignore:
-      - goarch: 386
+    gobinary: garble
 
 archives:
   - format: tar.gz
