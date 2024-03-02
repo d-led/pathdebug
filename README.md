@@ -97,18 +97,32 @@ tap Esc/q/Ctrl-C to quit, <-/-> to paginate
   •○
 ```
 
+and for the path variable with source detection:
+
+```text
++---+--------+-----+----------------------------------+-----------------+
+| # | DUP[#] | BAD | PATH                             | ±SOURCES        |
++---+--------+-----+----------------------------------+-----------------+
+| 1 |        |     | /Users/d/.opam/default/bin       |                 |
+| 2 |        |     | /Users/d/.local/share/ponyup/bin | ~/.zshrc        |
+| 3 |        |     | /usr/local/sbin                  | ~/.zshrc        |
+| 4 |        |     | /opt/homebrew/bin                | ~/.bash_profile |
+| 5 |        |     | /opt/homebrew/sbin               |                 |
++---+--------+-----+----------------------------------+-----------------+
+  •○○○○○
+```
+
 ### Direct Output
 
 ```bash
-export SOME_PATH='/sbin:~/.bashrc:/a:/b:/a:/c:/d:/e:/f:/g'
-pathdebug SOME_PATH -o table
+pathdebug PATH -o table
 ```
 
 see help for other formats
 
 ## Limitations
 
-- finding the sources where the PATH variable entries are set is best-effort
+- finding the sources where the `PATH` variable entries are set is best-effort, and is done only for the `PATH` environment variable at present
 - path set by executables currently not tracked as sources
 - CSV output may lag in output completeness
 
