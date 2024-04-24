@@ -53,7 +53,7 @@ go install github.com/d-led/pathdebug@latest
 
 Alternatively, download the binary from [Github releases](https://github.com/d-led/pathdebug/releases/).
 
-On OSX you might need to run `sudo xattr -r com.apple.quarantine pathdebug` on the downloaded binary.
+On OSX you might need to run `sudo xattr -d com.apple.quarantine pathdebug` on the downloaded binary.
 
 ### Download Latest Release
 
