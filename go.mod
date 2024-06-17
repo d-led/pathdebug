@@ -7,7 +7,7 @@ require (
 	github.com/charmbracelet/bubbletea v0.26.4
 	github.com/jedib0t/go-pretty/v6 v6.5.9
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 	github.com/zyedidia/generic v1.2.1
 	go.spiff.io/expand v1.1.0
