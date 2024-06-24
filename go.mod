@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/charmbracelet/bubbles v0.18.0
-	github.com/charmbracelet/bubbletea v0.26.4
+	github.com/charmbracelet/bubbletea v0.26.5
 	github.com/jedib0t/go-pretty/v6 v6.5.9
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.1
@@ -34,7 +34,7 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
