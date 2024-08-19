@@ -1,6 +1,7 @@
 module github.com/d-led/pathdebug
 
 go 1.21
+toolchain go1.22.5
 
 require (
 	github.com/charmbracelet/bubbles v0.18.0
@@ -11,7 +12,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/zyedidia/generic v1.2.1
 	go.spiff.io/expand v1.1.0
-	mvdan.cc/sh/v3 v3.8.0
+	mvdan.cc/sh/v3 v3.9.0
 )
 
 require (
@@ -33,8 +34,8 @@ require (
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 // indirect
-	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/sys v0.23.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
