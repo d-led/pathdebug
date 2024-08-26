@@ -1,8 +1,6 @@
 module github.com/d-led/pathdebug
 
-go 1.22
-
-toolchain go1.22.5
+go 1.23
 
 require (
 	github.com/charmbracelet/bubbles v0.19.0
