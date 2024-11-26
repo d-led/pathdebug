@@ -4,11 +4,11 @@ go 1.23
 
 require (
 	github.com/charmbracelet/bubbles v0.20.0
-	github.com/charmbracelet/bubbletea v1.2.1
-	github.com/jedib0t/go-pretty/v6 v6.6.1
+	github.com/charmbracelet/bubbletea v1.2.4
+	github.com/jedib0t/go-pretty/v6 v6.6.2
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/zyedidia/generic v1.2.1
 	go.spiff.io/expand v1.1.0
 	mvdan.cc/sh/v3 v3.10.0
@@ -17,7 +17,7 @@ require (
 require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/lipgloss v1.0.0 // indirect
-	github.com/charmbracelet/x/ansi v0.4.5 // indirect
+	github.com/charmbracelet/x/ansi v0.5.2 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
