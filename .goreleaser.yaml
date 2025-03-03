@@ -1,19 +1,33 @@
+version: 2
 before:
   hooks:
     - go mod tidy
     - go test ./...
 builds:
-  - env:
+  - id: windows
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - windows
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/d-led/pathdebug/common.Version={{.Version}}
+    hooks:
+      pre:
+        - go install mvdan.cc/garble@latest
+        - garble -tiny -literals -seed=random build
+  - id: non-windows
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
-      - windows
       - darwin
     ldflags:
       - -s -w -X github.com/d-led/pathdebug/common.Version={{.Version}}
 
 archives:
-  - format: tar.gz
+  - formats: [ 'tar.gz' ]
     # this name template makes the OS and Arch compatible with the results of uname.
     name_template: >-
       {{ .ProjectName }}_
@@ -25,11 +39,11 @@ archives:
     # use zip for windows archives
     format_overrides:
     - goos: windows
-      format: zip
+      formats: [ 'zip' ]
 checksum:
   name_template: 'checksums.txt'
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ incpatch .Version }}-next"
 changelog:
   sort: asc
   filters:
@@ -44,7 +58,7 @@ brews:
   -
     name: pathdebug
     homepage: "https://github.com/d-led/pathdebug"
-    tap:
+    repository:
       owner: d-led
       name: homebrew-d-led
     commit_author:
