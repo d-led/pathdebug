@@ -3,28 +3,21 @@ before:
   hooks:
     - go mod tidy
     - go test ./...
+    - go install mvdan.cc/garble@latest
 builds:
-  - id: windows
-    env:
+  - env:
       - CGO_ENABLED=0
     goos:
       - windows
+      - linux
+      - darwin
     flags:
       - -trimpath
     ldflags:
       - -s -w -X github.com/d-led/pathdebug/common.Version={{.Version}}
     hooks:
       pre:
-        - go install mvdan.cc/garble@latest
         - garble -tiny -literals -seed=random build
-  - id: non-windows
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-    ldflags:
-      - -s -w -X github.com/d-led/pathdebug/common.Version={{.Version}}
 
 archives:
   - formats: [ 'tar.gz' ]
