@@ -24,7 +24,7 @@ jobs:
           go-version: stable
       - name: install mono
         run: |
-          sudo apt-get update && sudo apt-get install -y mono-runtime
+          sudo apt-get update -qq && sudo apt-get install -y -qq mono-complete libmono-system-componentmodel-dataannotations4.0-cil
       - name: install choco
         run: |
           mkdir -p /opt/chocolatey
