@@ -2,9 +2,9 @@ name: goreleaser
 
 on:
   push:
-    # run only against tags
+    # run only against version tags
     tags:
-      - '*'
+      - 'v*.*.*'
 
 permissions:
   contents: write
@@ -22,6 +22,9 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
+      - name: install mono
+        run: |
+          apt-get update && apt-get install -y mono-runtime
       - name: install choco
         run: |
           mkdir -p /opt/chocolatey
